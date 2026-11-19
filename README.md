@@ -1,3 +1,7 @@
+
+# Smart Society Management System
+
+🚀 **Live Demo:** [Click here to view the project](https://smart-society-management-system-mvq0.onrender.com)
 # Smart Society (JSP / Tomcat 10.1 / MySQL)
 
 ## Run
