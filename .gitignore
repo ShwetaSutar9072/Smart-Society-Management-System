@@ -1,0 +1,23 @@
+# Maven build output
+target/
+
+# Java compiled files
+*.class
+
+# IDE files
+.settings/
+.project
+.classpath
+.vscode/
+nbproject/private/
+
+# Sensitive files
+.env
+*.properties.local
+
+# Database backups
+ss_backup/
+
+# Local configuration
+*.properties
+

@@ -1,0 +1,169 @@
+<%--
+  Page shell + navbar. Needs:  String role;  String pageTitle;  (and guard.jspf included before).
+--%>
+<%!
+    /** true when the current page matches any of the given hrefs */
+    static boolean on(String cur, String... hrefs) {
+        for (String hr : hrefs) {
+            if (hr.equals(cur)) return true;
+        }
+        return false;
+    }
+    static String navLink(String cur, String href, String icon, String label) {
+        return "<li class=\"nav-item\"><a class=\"nav-link" + (on(cur, href) ? " active\" aria-current=\"page" : "")
+                + "\" href=\"" + href + "\"><i class=\"bi " + icon + "\"></i>" + label + "</a></li>\n";
+    }
+    /** items: {href, icon, label} */
+    static String navDropdown(String cur, String icon, String label, String[][] items) {
+        boolean active = false;
+        for (String[] it : items) { if (on(cur, it[0])) active = true; }
+        StringBuilder sb = new StringBuilder();
+        sb.append("<li class=\"nav-item dropdown\"><a class=\"nav-link dropdown-toggle").append(active ? " active" : "")
+          .append("\" href=\"#\" role=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"><i class=\"bi ")
+          .append(icon).append("\"></i>").append(label).append("</a><ul class=\"dropdown-menu\">");
+        for (String[] it : items) {
+            sb.append("<li><a class=\"dropdown-item").append(on(cur, it[0]) ? " active" : "")
+              .append("\" href=\"").append(it[0]).append("\"><i class=\"bi ").append(it[1]).append("\"></i>")
+              .append(it[2]).append("</a></li>");
+        }
+        sb.append("</ul></li>\n");
+        return sb.toString();
+    }
+%>
+<%
+    String cur = request.getServletPath();
+    cur = cur.substring(cur.lastIndexOf('/') + 1);
+    if (request.getParameter("type") != null && request.getParameter("type").matches("[1-4]")) {
+        cur = cur + "?type=" + request.getParameter("type");
+    }
+    String homeHref = "admin".equals(role) ? "AdminHomePage.jsp" : ("resident".equals(role) ? "ResidentHomepage.jsp" : "Mainhome.jsp");
+    // public pages: if someone is already logged in, show their dashboard instead of the login buttons
+    String loggedAs = isAdmin ? "admin" : (residentUser != null ? "resident" : null);
+    if (request.getParameter("loggedout") != null) {
+        Web.flash(session, "success", "You have been logged out.");
+    }
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= h(pageTitle) %> | Smart Society</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%A2%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top ss-navbar" aria-label="Main navigation">
+    <div class="container">
+        <a class="navbar-brand" href="<%= homeHref %>">
+            <span class="brand-mark"><i class="bi bi-buildings-fill"></i></span>
+            <span>Smart Society<small><%= "admin".equals(role) ? "Admin panel" : ("resident".equals(role) ? "Resident portal" : "Utilities") %></small></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-lg-auto me-lg-3 align-items-lg-center">
+<%
+    if ("admin".equals(role)) {
+        out.print(navLink(cur, "AdminHomePage.jsp", "bi-speedometer2", "Dashboard"));
+        out.print(navLink(cur, "viewregistration.jsp", "bi-people", "Residents"));
+        out.print(navDropdown(cur, "bi-cash-coin", "Charges", new String[][]{
+            {"CommonCharges.jsp", "bi-plus-circle", "Add charges"},
+            {"SearchPayCharges.jsp", "bi-receipt", "Paid charges"}}));
+        out.print(navDropdown(cur, "bi-tools", "Services", new String[][]{
+            {"Addservices.jsp", "bi-plus-circle", "Add / edit services"},
+            {"OtherServices.jsp", "bi-person-vcard", "Service providers"},
+            {"Adminviewservice.jsp?type=1", "bi-shield-check", "Security subscriptions"},
+            {"Adminviewservice.jsp?type=2", "bi-stars", "Cleaning subscriptions"},
+            {"Adminviewservice.jsp?type=3", "bi-droplet", "Plumbing &amp; water subscriptions"},
+            {"Adminviewservice.jsp?type=4", "bi-lightning-charge", "Electrical subscriptions"}}));
+        out.print(navDropdown(cur, "bi-calendar-event", "Events", new String[][]{
+            {"EventInfo.jsp", "bi-plus-circle", "Add event"},
+            {"SearchBookingEvent.jsp", "bi-journal-check", "Event bookings"}}));
+        out.print(navLink(cur, "viewsuggestion.jsp", "bi-chat-left-text", "Feedback"));
+    } else if ("resident".equals(role)) {
+        out.print(navLink(cur, "ResidentHomepage.jsp", "bi-house-door", "Home"));
+        out.print(navDropdown(cur, "bi-tools", "Services", new String[][]{
+            {"SearchService.jsp", "bi-grid", "All services"},
+            {"ServiceDetail.jsp?type=1", "bi-shield-check", "Security"},
+            {"ServiceDetail.jsp?type=2", "bi-stars", "Cleaning"},
+            {"ServiceDetail.jsp?type=3", "bi-droplet", "Plumbing &amp; water"},
+            {"ServiceDetail.jsp?type=4", "bi-lightning-charge", "Electrical"}}));
+        out.print(navLink(cur, "SearchTotalCharges.jsp", "bi-cash-coin", "Charges"));
+        out.print(navLink(cur, "SearchEvent.jsp", "bi-calendar-event", "Events"));
+        out.print(navLink(cur, "MyPayments.jsp", "bi-receipt", "My payments"));
+        out.print(navLink(cur, "Suggestion.jsp", "bi-chat-left-text", "Feedback"));
+    } else {
+        out.print(navLink(cur, "Mainhome.jsp", "bi-house-door", "Home"));
+        out.print(navLink(cur, "about.jsp", "bi-info-circle", "About us"));
+        out.print(navLink(cur, "contactus.jsp", "bi-envelope", "Contact us"));
+    }
+%>
+            </ul>
+            <div class="nav-actions">
+<%
+    if ("admin".equals(role)) {
+%>
+                <span class="text-muted small d-none d-xl-inline"><i class="bi bi-shield-lock"></i> Administrator</span>
+                <a class="btn btn-outline-success" href="logout.jsp"><i class="bi bi-box-arrow-right"></i> Logout</a>
+<%
+    } else if ("resident".equals(role)) {
+%>
+                <div class="dropdown">
+                    <button class="btn btn-outline-success dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle"></i> <%= h(residentUser) %>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="MyPayments.jsp"><i class="bi bi-receipt"></i>My payments</a></li>
+                        <li><a class="dropdown-item" href="Suggestion.jsp"><i class="bi bi-chat-left-text"></i>Send feedback</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="logout.jsp"><i class="bi bi-box-arrow-right"></i>Logout</a></li>
+                    </ul>
+                </div>
+<%
+    } else if (loggedAs != null) {
+%>
+                <a class="btn btn-success" href="<%= "admin".equals(loggedAs) ? "AdminHomePage.jsp" : "ResidentHomepage.jsp" %>"><i class="bi bi-speedometer2"></i> My dashboard</a>
+                <a class="btn btn-outline-success" href="logout.jsp"><i class="bi bi-box-arrow-right"></i> Logout</a>
+<%
+    } else {
+%>
+                <a class="btn btn-outline-success<%= on(cur, "Registration.jsp") ? " active" : "" %>" href="Registration.jsp"><i class="bi bi-person-plus"></i> Register</a>
+                <div class="dropdown">
+                    <button class="btn btn-success dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item<%= on(cur, "ResidentLogin.jsp") ? " active" : "" %>" href="ResidentLogin.jsp"><i class="bi bi-person"></i>Resident login</a></li>
+                        <li><a class="dropdown-item<%= on(cur, "AdminLogin.jsp") ? " active" : "" %>" href="AdminLogin.jsp"><i class="bi bi-shield-lock"></i>Admin login</a></li>
+                    </ul>
+                </div>
+<%
+    }
+%>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<%
+    String flashMsg = (String) session.getAttribute("flashMsg");
+    if (flashMsg != null) {
+        String flashType = (String) session.getAttribute("flashType");
+        session.removeAttribute("flashMsg");
+        session.removeAttribute("flashType");
+%>
+<div class="container mt-3 no-print">
+    <div class="alert alert-<%= h(flashType == null ? "info" : flashType) %> alert-dismissible fade show mb-0" role="alert">
+        <%= h(flashMsg) %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
+<%
+    }
+%>
+<main>

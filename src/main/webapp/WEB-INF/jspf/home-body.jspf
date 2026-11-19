@@ -1,0 +1,75 @@
+<%-- Landing content shared by Mainhome.jsp (public) and ResidentHomepage.jsp (resident). Needs: String role. --%>
+<%
+    boolean res = "resident".equals(role);
+    String[][] tiles = {
+        {"Security",            "security.jpg",    res ? "ServiceDetail.jsp?type=1" : "ResidentLogin.jsp"},
+        {"Cleaning",            "cleaning.jpg",    res ? "ServiceDetail.jsp?type=2" : "ResidentLogin.jsp"},
+        {"Water and plumbing",  "water.jpg",       res ? "ServiceDetail.jsp?type=3" : "ResidentLogin.jsp"},
+        {"Electricity",         "electricity.jpg", res ? "ServiceDetail.jsp?type=4" : "ResidentLogin.jsp"},
+        {"Events",              "event.jpg",       res ? "SearchEvent.jsp"          : "ResidentLogin.jsp"},
+        {"Other services",      "others.jpg",      res ? "SearchService.jsp"        : "ResidentLogin.jsp"},
+    };
+%>
+<section class="hero" aria-label="Welcome">
+    <div class="hero-slide"></div>
+    <div class="hero-slide"></div>
+    <div class="hero-content">
+<% if (res) { %>
+        <div class="welcome-chip"><i class="bi bi-person-circle"></i> Welcome back, <strong><%= h(residentUser) %></strong></div>
+<% } %>
+        <p class="lead mb-2">We help you to make your Society &ndash; Smarter and Well Managed</p>
+        <h1 class="mb-4">SMART SOCIETY UTILITIES</h1>
+<% if (res) { %>
+        <a class="btn btn-success btn-lg me-2 mb-2" href="SearchTotalCharges.jsp"><i class="bi bi-cash-coin"></i> Pay charges</a>
+        <a class="btn btn-light btn-lg mb-2" href="SearchService.jsp"><i class="bi bi-tools"></i> Browse services</a>
+<% } else { %>
+        <a class="btn btn-success btn-lg me-2 mb-2" href="ResidentLogin.jsp"><i class="bi bi-box-arrow-in-right"></i> Resident login</a>
+        <a class="btn btn-light btn-lg mb-2" href="Registration.jsp"><i class="bi bi-person-plus"></i> Register now</a>
+<% } %>
+    </div>
+</section>
+
+<div class="ticker">
+    <div class="container">Happy Communities are made of Delightful Resident Experiences! Here&rsquo;s the website devoted to it!</div>
+</div>
+
+<section class="section band">
+    <div class="container">
+        <h2 class="section-title text-center mb-4">MAKE SOCIETY DIGITAL &amp; PAPERLESS</h2>
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6"><img class="about-img" src="img/garden.jpg" alt="Society garden" loading="lazy"></div>
+            <div class="col-lg-6">
+                <h3 class="h4 fw-bold">Benefit of our website</h3>
+                <p class="text-muted mb-0">Managing residential societies using these online society management solutions keeps
+                all concerned people aware of the events. With sophisticated email and SMS alerts, instant notification,
+                and contact and document management modules, members find it convenient and fast.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title text-center mb-2">Services</h2>
+        <p class="section-sub text-center mb-4">Everything your society needs, in one place.</p>
+        <div class="row g-4">
+<% for (String[] t : tiles) { %>
+            <div class="col-sm-6 col-lg-4">
+                <a class="svc-card" href="<%= t[2] %>">
+                    <img src="img/<%= t[1] %>" alt="<%= t[0] %>" loading="lazy">
+                    <span class="svc-label"><%= t[0] %> <i class="bi bi-arrow-right-circle"></i></span>
+                </a>
+            </div>
+<% } %>
+        </div>
+    </div>
+</section>
+
+<section class="section band">
+    <div class="container text-center" style="max-width:860px">
+        <p class="fs-5 fw-semibold mb-0">As soon as you refuse to accept the change, you fail!
+        You must choose smart society management software to keep your society running smoothly with the lowest effort.
+        Our website incorporates each necessary feature and keeps upgrading itself as per the requirement.
+        Now you can manage the entire society with just a few clicks.</p>
+    </div>
+</section>

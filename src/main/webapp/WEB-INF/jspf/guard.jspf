@@ -1,0 +1,24 @@
+<%--
+  Access control. A page sets   String role = "public" | "resident" | "admin";   before including this file.
+  Must be included before anything is written to the response.
+--%>
+<%
+    final boolean isAdmin = session.getAttribute("admin") != null;
+    final String residentUser = (String) session.getAttribute("unm1");
+    if ("admin".equals(role) && !isAdmin) {
+        Web.flash(session, "warning", "Please log in as admin to continue.");
+        response.sendRedirect("AdminLogin.jsp");
+        return;
+    }
+    if ("resident".equals(role) && residentUser == null) {
+        Web.flash(session, "warning", "Please log in to continue.");
+        response.sendRedirect("ResidentLogin.jsp");
+        return;
+    }
+    if (!"public".equals(role)) {
+        // stop the browser back-button from showing private pages after logout
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
+    }
+%>

@@ -1,0 +1,50 @@
+</main>
+<footer class="ss-footer">
+    <div class="container pt-5 pb-4">
+        <div class="row g-4">
+            <div class="col-md-5">
+                <h2><i class="bi bi-buildings-fill"></i>Smart Society</h2>
+                <ul>
+                    <li><i class="bi bi-geo-alt"></i>Nivasa Anaya, Pune</li>
+                    <li><i class="bi bi-telephone"></i><a href="tel:7939897564">7939897564</a></li>
+                    <li><i class="bi bi-envelope"></i><a href="mailto:info@company.com">info@company.com</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 offset-md-3">
+                <h2>Quick links</h2>
+                <ul>
+<%
+    if ("admin".equals(role)) {
+%>
+                    <li><a href="AdminHomePage.jsp">Dashboard</a></li>
+                    <li><a href="viewregistration.jsp">Residents</a></li>
+                    <li><a href="CommonCharges.jsp">Add charges</a></li>
+                    <li><a href="SearchBookingEvent.jsp">Event bookings</a></li>
+<%
+    } else if ("resident".equals(role)) {
+%>
+                    <li><a href="ResidentHomepage.jsp">Home</a></li>
+                    <li><a href="SearchService.jsp">Services</a></li>
+                    <li><a href="SearchTotalCharges.jsp">Charges</a></li>
+                    <li><a href="SearchEvent.jsp">Events</a></li>
+                    <li><a href="contactus.jsp">Contact us</a></li>
+<%
+    } else {
+%>
+                    <li><a href="Mainhome.jsp">Home</a></li>
+                    <li><a href="about.jsp">About us</a></li>
+                    <li><a href="contactus.jsp">Contact us</a></li>
+                    <li><a href="Registration.jsp">Register</a></li>
+                    <li><a href="ResidentLogin.jsp">Resident login</a></li>
+<%
+    }
+%>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="copy">&copy; <%= java.time.Year.now() %> Smart Society &middot; Designed by Shweta Sutar and Sanika Sable</div>
+</footer>
+<script src="js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
